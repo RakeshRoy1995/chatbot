@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Shop</title>
+  <style>
+    body {
+      font-family: Arial;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      gap: 20px;
+    }
+
+    .products {
+      flex: 2;
+    }
+
+    .chat {
+      flex: 1;
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .card {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .price {
+      color: green;
+      font-weight: bold;
+    }
+
+    #chatBox {
+      flex: 1;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      padding: 10px;
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+    }
+
+    input {
+      width: 70%;
+      padding: 8px;
+    }
+
+    button {
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>🛒 Smart Shopping Dashboard</h2>
+
+<div class="container">
+
+  <!-- PRODUCTS -->
+  <div class="products">
+    <h3>Products</h3>
+    <div class="grid" id="products"></div>
+  </div>
+
+  <!-- CHATBOT -->
+  <div class="chat">
+    <h3>AI Assistant</h3>
+
+    <div id="chatBox"></div>
+
+    <div>
+      <input id="input" placeholder="Ask about products..." />
+      <button onclick="send()">Send</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---------------- PRODUCTS ----------------
+async function loadProducts() {
+  const res = await fetch("/products-data");
+  const data = await res.json();
+
+  const container = document.getElementById("products");
+
+  data.forEach(p => {
+    container.innerHTML += `
+      <div class="card">
+        <h3>${p.name}</h3>
+        <p>${p.brand}</p>
+        <p class="price">$${p.price}</p>
+        <p>⭐ ${p.rating}</p>
+        <p>stock: ${p.stock}</p>
+        <p>${p.category}</p>
+      </div>
+    `;
+  });
+}
+
+loadProducts();
+
+
+// ---------------- CHATBOT ----------------
+async function send() {
+  const input = document.getElementById("input");
+  const chatBox = document.getElementById("chatBox");
+
+  const container = document.getElementById("products");
+
+  const message = input.value;
+  if (!message) return;
+
+  chatBox.innerText += "\nYou: " + message + "\nAI: ";
+  input.value = "";
+
+  const res = await fetch("/ai-advance-filter", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message })
+  });
+
+  const data = await res.json();
+
+  if(data.reply?.product?.products){
+    container.innerHTML = "";
+
+    data.reply?.product?.products.forEach(p => {
+      
+      container.innerHTML += `
+        <div class="card">
+          <h3>${p?.name || ""}</h3>
+          <p>features : ${p?.brand || ""}</p>
+          <p class="price">$${p?.price || ""}</p>
+          <p> ${p?.description || ""}</p>
+          <p>${p?.category || ""}</p>
+        </div>
+      `;
+    });
+    
+
+  }
+
+  chatBox.innerText += data.reply?.product?.explaination + "\n" +  data.reply?.product?.recommendation + "\n" + data.reply?.product?.Comparison ;
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+</script>
+
+</body>
+</html>
