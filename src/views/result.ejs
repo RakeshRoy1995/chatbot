@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CV Analysis</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .muted {
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+<h1>AI CV Analysis</h1>
+
+<!-- ================= Job Matcher ================= -->
+<div>
+  <%- jobMatcher %>
+</div>
+
+<!-- ================= Candidate Info ================= -->
+<div class="card">
+  <h2>👤 Candidate Info</h2>
+
+  <p><strong>Name:</strong> <%= data?.candidateName || "N/A" %></p>
+  <p><strong>Email:</strong> <%= data?.candidateEmail || "N/A" %></p>
+  <p><strong>Phone:</strong> <%= data?.candidatePhone || "N/A" %></p>
+  <p><strong>Address:</strong> <%= data?.candidateAddress || "N/A" %></p>
+</div>
+
+<!-- ================= Summary ================= -->
+<div class="card">
+  <h2>📄 Summary</h2>
+  <p><%= data?.candidateSummary || "No summary available" %></p>
+</div>
+
+<!-- ================= Skills ================= -->
+<div class="card">
+  <h2>🛠 Skills</h2>
+
+  <ul>
+    <% if (Array.isArray(data?.skills) && data.skills.length) { %>
+      <% data.skills.forEach(skill => { %>
+        <li><%= skill %></li>
+      <% }) %>
+    <% } else { %>
+      <li class="muted">No skills found</li>
+    <% } %>
+  </ul>
+</div>
+
+<!-- ================= Professional Experience ================= -->
+<div class="card">
+  <h2>💼 Professional Experience</h2>
+
+  <% if (Array.isArray(data?.candidateProfessionalList) && data.candidateProfessionalList.length) { %>
+    <ul>
+      <% data.candidateProfessionalList.forEach(job => { %>
+        <li>
+          <strong><%= job.jobTitle || "N/A" %></strong>
+          at <%= job.company || "Unknown Company" %>
+
+          <% if (job.location) { %>
+            - <%= job.location %>
+          <% } %>
+
+          <% if (job.duration) { %>
+            (<%= job.duration %>)
+          <% } %>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p class="muted">No professional experience provided</p>
+  <% } %>
+</div>
+
+<!-- ================= Job Roles ================= -->
+<div class="card">
+  <h2>💼 Suitable Job Roles</h2>
+
+  <ul>
+    <% if (Array.isArray(data?.jobRolesSuitableFor) && data.jobRolesSuitableFor.length) { %>
+      <% data.jobRolesSuitableFor.forEach(role => { %>
+        <li><%= role %></li>
+      <% }) %>
+    <% } else { %>
+      <li class="muted">No roles found</li>
+    <% } %>
+  </ul>
+</div>
+
+<!-- ================= Weak Points ================= -->
+<div class="card">
+  <h2>⚠ Weak Points</h2>
+
+  <% if (Array.isArray(data?.weakPoints) && data.weakPoints.length) { %>
+    <ul>
+      <% data.weakPoints.forEach(w => { %>
+        <li><%= w %></li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p class="muted">No major weaknesses detected</p>
+  <% } %>
+</div>
+
+<!-- ================= Improvement ================= -->
+<div class="card">
+  <h2>🚀 Improvement Suggestions</h2>
+
+  <% if (Array.isArray(data?.improvementSuggestions) && data.improvementSuggestions.length) { %>
+    <ul>
+      <% data.improvementSuggestions.forEach(s => { %>
+        <li><%= s %></li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p class="muted">No suggestions provided</p>
+  <% } %>
+</div>
+
+<!-- ================= Projects ================= -->
+<div class="card">
+  <h2>📦 Projects</h2>
+
+  <% if (Array.isArray(data?.projects) && data.projects.length) { %>
+    <ul>
+      <% data.projects.forEach(p => { %>
+        <li>
+          <% if (typeof p === "string") { %>
+            <%= p %>
+          <% } else { %>
+            <strong><%= p.name || "Untitled" %></strong>
+            <% if (Array.isArray(p.techStack) && p.techStack.length) { %>
+              - [<%= p.techStack.join(", ") %>]
+            <% } %>
+          <% } %>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p class="muted">No projects found</p>
+  <% } %>
+</div>
+
+<!-- ================= Links ================= -->
+<div class="card">
+  <h2>🔗 Links</h2>
+  <ul>
+    <% if (Array.isArray(data?.candidateProfessionalList)) { %>
+      <% data.candidateProfessionalList.forEach(link => { %>
+        <% if (typeof link === "string") { %>
+          <li><a href="<%= link %>" target="_blank"><%= link %></a></li>
+        <% } else if (link.url) { %>
+          <li><a href="<%= link.url %>" target="_blank"><%= link.url %></a></li>
+        <% } %>
+      <% }) %>
+    <% } %>
+  </ul>
+</div>
+
+<br />
+
+<a href="/cv">⬅ Upload another CV</a>
+<br />
+<a href="/products" target="_blank">Product Filter</a>
+<br />
+<a href="/" target="_blank">Sample AI Reply</a>
+
+</body>
+</html>
